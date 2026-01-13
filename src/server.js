@@ -1,3 +1,6 @@
+// Завантажуємо змінні середовища з .env
+import 'dotenv/config';
+
 import express from 'express';
 import cors from 'cors';
 import pinoHttp from 'pino-http';
