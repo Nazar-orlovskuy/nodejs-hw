@@ -1,13 +1,12 @@
-import createHttpError from 'http-errors';
+import { HttpError } from 'http-errors';
 
 export const errorHandler = (err, req, res, next) => {
   let status = 500;
   let message = 'Internal Server Error';
 
-
-  if (createHttpError.isHttpError(err)) {
+  if (err instanceof HttpError) {
     status = err.status;
-    message = err.message;
+    message = err.message || err.name;
   } else if (err instanceof Error) {
     message = err.message;
   }
