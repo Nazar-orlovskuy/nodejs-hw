@@ -1,63 +1,27 @@
-// Завантажуємо змінні середовища з .env
-import 'dotenv/config';
+import dotenv from 'dotenv';
+dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
-import pinoHttp from 'pino-http';
+
+import { connectMongoDB } from './db/connectMongoDB.js';
+import notesRoutes from './routes/notesRoutes.js';
+import { logger } from './middleware/logger.js';
+import { notFoundHandler } from './middleware/notFoundHandler.js';
+import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
 
-/* Middleware */
+await connectMongoDB();
 
-// CORS
+app.use(logger);
+app.use(express.json());
 app.use(cors());
 
-// JSON body parser
-app.use(express.json());
+app.use(notesRoutes);
 
-// HTTP logger
-app.use(pinoHttp());
-
-/* Routes */
-
-// GET /notes — get all notes
-app.get('/notes', (req, res) => {
-  res.status(200).json({
-    message: 'Retrieved all notes',
-  });
-});
-
-// GET /notes/:noteId — get note by ID
-app.get('/notes/:noteId', (req, res) => {
-  const { noteId } = req.params;
-
-  res.status(200).json({
-    message: `Retrieved note with ID: ${noteId}`,
-  });
-});
-
-// Test error route
-app.get('/test-error', () => {
-  throw new Error('Simulated server error');
-});
-
-/* 404 Middleware */
-
-app.use((req, res) => {
-  res.status(404).json({
-    message: 'Route not found',
-  });
-});
-
-/* Error Handler */
-
-app.use((err, req, res, next) => {
-  res.status(500).json({
-    message: err.message,
-  });
-});
-
-/* Server */
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 
