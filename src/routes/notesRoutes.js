@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { celebrate, Segments, Joi } from 'celebrate';
+import { celebrate } from 'celebrate';
 import {
   getAllNotes,
   getNoteById,
@@ -8,41 +8,24 @@ import {
   updateNote,
 } from '../controllers/notesController.js';
 
+
+import {
+  getAllNotesSchema,
+  noteIdSchema,
+  createNoteSchema,
+  updateNoteSchema,
+} from '../schemas/notesSchemas.js';
+
 const router = Router();
 
+router.get('/notes', celebrate(getAllNotesSchema), getAllNotes);
 
-const noteIdSchema = celebrate({
-  [Segments.PARAMS]: Joi.object({
-    noteId: Joi.string().hex().length(24).required(),
-  }),
-});
+router.get('/notes/:noteId', celebrate(noteIdSchema), getNoteById);
 
-const createNoteSchema = celebrate({
-  [Segments.BODY]: Joi.object({
-    title: Joi.string().min(3).max(100).required(),
-    content: Joi.string().min(1).required(),
-  }),
-});
+router.post('/notes', celebrate(createNoteSchema), createNote);
 
-const updateNoteSchema = celebrate({
-  [Segments.PARAMS]: Joi.object({
-    noteId: Joi.string().hex().length(24).required(),
-  }),
-  [Segments.BODY]: Joi.object({
-    title: Joi.string().min(3).max(100),
-    content: Joi.string().min(1),
-  }),
-});
+router.delete('/notes/:noteId', celebrate(noteIdSchema), deleteNote);
 
-
-router.get('/notes', getAllNotes);
-
-router.get('/notes/:noteId', noteIdSchema, getNoteById);
-
-router.post('/notes', createNoteSchema, createNote);
-
-router.delete('/notes/:noteId', noteIdSchema, deleteNote);
-
-router.patch('/notes/:noteId', updateNoteSchema, updateNote);
+router.patch('/notes/:noteId', celebrate(updateNoteSchema), updateNote);
 
 export default router;
