@@ -130,7 +130,7 @@ export const requestResetEmail = async (req, res, next) => {
     const html = compile({ name: user.username || user.email, link });
 
     try {
-      await sendEmail({ to: user.email, subject: 'Password reset', html });
+      await sendEmail({ from: process.env.SMTP_FROM, to: user.email, subject: 'Password reset', html });
     } catch {
       throw createHttpError(500, 'Failed to send the email, please try again later.');
     }

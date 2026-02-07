@@ -28,9 +28,10 @@ app.use(authRoutes);
 app.use(notesRoutes);
 app.use(userRoutes);
 
+app.use(notFoundHandler);
+
 app.use(celebrateErrors());
 
-app.use(notFoundHandler);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;

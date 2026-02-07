@@ -5,8 +5,6 @@ import { updateUserAvatar } from '../controllers/userController.js';
 
 const router = Router();
 
-router.use(authenticate);
-
-router.patch('/users/me/avatar', upload.single('avatar'), updateUserAvatar);
+router.patch('/users/me/avatar', authenticate, upload.single('avatar'), updateUserAvatar);
 
 export default router;

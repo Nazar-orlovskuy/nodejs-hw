@@ -7,14 +7,28 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export const saveFileToCloudinary = (buffer) => {
+export const saveFileToCloudinary = (buffer, filename) => {
   return new Promise((resolve, reject) => {
     const readable = new Readable();
     readable._read = () => {};
     readable.push(buffer);
     readable.push(null);
 
-    const uploadStream = cloudinary.uploader.upload_stream({ folder: 'avatars' }, (error, result) => {
+    const uploadOptions = {
+      folder: 'avatars',
+      resource_type: 'image',
+      overwrite: true,
+      use_filename: true,
+      unique_filename: false,
+    };
+
+    // include public_id if filename provided (without extension)
+    if (filename) {
+      const name = filename.replace(/\.[^/.]+$/, '');
+      uploadOptions.public_id = name;
+    }
+
+    const uploadStream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
       if (error) return reject(error);
       resolve(result);
     });
